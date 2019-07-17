@@ -1,0 +1,381 @@
+{% extends "timeline/base.html" %}
+
+{% load i18n static %}
+
+{% block title %}Home{% endblock title %}
+<link rel="stylesheet" href="{% static 'timeline/css/index.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'timeline/css/lds-roller.css' %}"> -->
+{% block content %}
+<!-- <div class="loader">
+    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</div> -->
+<div class="fixedbutton right" style="z-index: 10;">
+    <button type="button" id="fixedbutton" class="button is-info is-rounded">ツイートする</button>
+</div>
+<div class="fixedbutton left" style="z-index: 10;">
+    <label class="switch">
+        <input type="checkbox" id="toggle-switch">
+        <span class="slider round"></span>
+    </label>
+</div>
+<div class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <!-- Any other Bulma elements you want -->
+    <div class="modal" id="my-modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <form action="{% url 'timeline:tweet_add' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <header class="modal-card-head">
+                    <button type="button" id="leftbutton" class="delete" aria-label="close" data-target="my-modal"></button>
+                    <button type="submit" id="rightbutton" class="button is-info is-rounded">ツイートする</button>
+                </header>
+                <section class="modal-card-body">
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-64x64">
+                            <!-- <img id="profile" src="{% static 'timeline/images/a.jpg' %}"> -->
+                            {% if current_account_of_user.profile_image  %}
+                            <img id="profile" class="lazyload" src="{% static 'images/transparent.png' %}" data-src="{{ current_account_of_user.profile_image.url }}">
+                            {% else %}
+                            <img id="profile" class="lazyload" src="{% static 'images/transparent.png' %}" data-src="{% static 'images/egg.jpg' %}">
+                            {% endif %}
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="field">
+                                    <p class="control">
+                                        <textarea name="tweet" class="textarea is-info" placeholder="いまどうしてる？"></textarea>
+                                    </p>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+                <footer class="modal-card-foot">
+                    <label for="image_uploads"><a><i class="far fa-image"></i></a></label>
+                    <input id="image_uploads" type="file" name="picture" accept="image/*">
+                </footer>
+            </form>
+        </div>
+    </div>
+    <!-- Any other Bulma elements you want -->
+  </div>
+</div>
+<div class="container">
+    <div class="contents" style="display: none">
+        {% if len_of_context == 4 %}
+        {% for ordered_tweet, user_of_tweet, account, is_favorited_tweet in context %}
+        <div class="columns">
+            <div class="column"></div>
+            <div class="column is-three-fifths">
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="image is-96x96">
+                        <img class="lazyload" id="profile" src="{% static 'images/transparent.png' %}" data-src="{{ account.profile_image.url }}" alt="Placeholder image">
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
+                        <p>
+                            <a href="{% url 'accounts:detail' user_of_tweet.username %}"><strong>{{ account.name }}</strong></a> <small>@{{ user_of_tweet.username }}</small> <small>{{ ordered_tweet.created_at }}</small>
+                            <br>
+                            {{ ordered_tweet.tweet }}
+                        </p>
+                        {% if ordered_tweet.picture %}
+                        <img class="lazyload" id="picture" src="{% static 'images/transparent.png' %}" data-src="{{ ordered_tweet.picture.url }}" alt="Placeholder image">
+                        {% endif %}
+                        </div>
+                        <nav class="level is-mobile">
+                        <div class="level-left">
+                            <a class="level-item">
+                            <span class="icon is-small has-text-grey-lighter"><i class="fas fa-reply"></i></span>
+                            </a>
+                            <a class="level-item">
+                            <span class="icon is-small has-text-grey-lighter"><i class="fas fa-retweet"></i></span>
+                            </a>
+                            {% if is_favorited_tweet %}
+                            <form action="{% url 'timeline:favorite_delete' %}" method="POST">
+                                {% csrf_token %}
+                                <button class="level-item" type="submit">
+                                <!-- <a class="level-item"> -->
+                                <!-- <span class="icon is-small has-text-grey-lighter"><i class="fas fa-heart"></i></span> -->
+                                <span class="icon is-small has-text-danger"><i class="fas fa-heart"></i></span>
+                                <!-- </a> -->
+                                </button>
+                                <input class="input" type="text" name="tweet" placeholder="Text input" style="display: none" value="{{ ordered_tweet.id }}">
+                            </form>
+                            {% else %}
+                            <form action="{% url 'timeline:favorite_add' %}" method="POST">
+                                {% csrf_token %}
+                                <button class="level-item" type="submit">
+                                <!-- <a class="level-item"> -->
+                                <span class="icon is-small has-text-grey-lighter"><i class="fas fa-heart"></i></span>
+                                <!-- <span class="icon is-small has-text-danger"><i class="fas fa-heart"></i></span> -->
+                                <!-- </a> -->
+                                </button>
+                                <input class="input" type="text" name="tweet" placeholder="Text input" style="display: none" value="{{ ordered_tweet.id }}">
+                            </form>
+                            {% endif %}
+                        </div>
+                        </nav>
+                    </div>
+                    <div class="media-right">
+                        <!-- <i><i class="fas fa-chevron-down"></i></!-->
+                        <div class="dropdown">
+                            <div class="dropdown-trigger">
+                              <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                <span></span>
+                                <span class="icon is-small has-text-grey-lighter">
+                                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                              </button>
+                            </div>
+                            {% if current_user.username == user_of_tweet.username %}
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                              <div class="dropdown-content">
+                                    <form action="{% url 'timeline:tweet_delete' %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item has-text-danger">&nbsp<i class="far fa-trash-alt"></i>&nbsp
+                                        削除
+                                        </button>
+                                        <input class="input" type="text" name="tweet" placeholder="Text input" style="display: none" value="{{ ordered_tweet.id }}">
+                                    </form>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </div>
+                    </div>
+                </article>
+            </div>
+            <div class="column"></div>
+        </div>
+        {% endfor %}
+        
+        {% elif len_of_context == 3 %}
+        {% for ordered_tweet, user_of_tweet, account in context %}
+        <div class="columns">
+            <div class="column"></div>
+            <div class="column is-three-fifths">
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="image is-96x96">
+                        <img class="lazyload" id="profile" src="{% static 'images/transparent.png' %}" data-src="{{ account.profile_image.url }}" alt="Placeholder image">
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
+                        <p>
+                            <a href="{% url 'accounts:detail' user_of_tweet.username %}"><strong>{{ account.name }}</strong></a> <small>@{{ user_of_tweet.username }}</small> <small>{{ ordered_tweet.created_at }}</small>
+                            <br>
+                            {{ ordered_tweet.tweet }}
+                        </p>
+                        {% if ordered_tweet.picture %}
+                        <img class="lazyload" id="picture" src="{% static 'images/transparent.png' %}" data-src="{{ ordered_tweet.picture.url }}" alt="Placeholder image">
+                        {% endif %}
+                        </div>
+                        <nav class="level is-mobile">
+                        <div class="level-left">
+                            <a class="level-item">
+                            <span class="icon is-small has-text-grey-lighter"><i class="fas fa-reply"></i></span>
+                            </a>
+                            <a class="level-item">
+                            <span class="icon is-small has-text-grey-lighter"><i class="fas fa-retweet"></i></span>
+                            </a>
+                            <a class="level-item">
+                                <span class="icon is-small has-text-grey-lighter"><i class="fas fa-heart"></i></span>
+                            </a>
+                        </div>
+                        </nav>
+                    </div>
+                    <div class="media-right">
+                        <!-- <i><i class="fas fa-chevron-down"></i></!-->
+                        <div class="dropdown">
+                            <div class="dropdown-trigger">
+                              <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                <span></span>
+                                <span class="icon is-small has-text-grey-lighter">
+                                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                              </button>
+                            </div>
+                            {% if current_user.username == user_of_tweet.username %}
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                              <div class="dropdown-content">
+                                    <form action="{% url 'timeline:tweet_delete' %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item has-text-danger">&nbsp<i class="far fa-trash-alt"></i>&nbsp
+                                        削除
+                                        </button>
+                                        <input class="input" type="text" name="tweet" placeholder="Text input" style="display: none" value="{{ ordered_tweet.id }}">
+                                    </form>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </div>
+                    </div>
+                </article>
+            </div>
+            <div class="column"></div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+<script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+{% block extra_js %}
+<script>
+$(window).on('load',function(){
+    // $('.loader').fadeOut('slow'); 
+    $('img#picture').css ({
+    height: "291px !important",
+    width: "519px !important"
+}); 
+    $('img#profile').css({
+    "border-radius": "50% !important",
+    height: "100% !important",
+    width: "100% !important"
+    });
+    $('button#fixedbutton').on('click', function(){
+        $('div.modal').addClass('is-active');
+    });
+    $('.modal-background, button.delete').on('click', function(){
+        $('div.modal').removeClass('is-active');
+    });
+    $('a.navbar-item').css({
+    "margin-left": "70px",
+    })
+    $('div.navbar-dropdown a.navbar-item').css({
+        'margin-left': 'initial'
+    });
+    $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+        border: 'transparent'
+    });
+    $('.contents').fadeIn('slow');
+    // $('.contents').css({
+    //     display: 'block'
+    // });
+    $('img#profile.lazyload').lazyload();
+    $('img#picture.lazyload').lazyload();
+    $('button.button').on('click', function(){
+        $(this).parent('div').parent('div').toggleClass('is-active');
+        })
+    $('a.dropdown-item.has-text-danger').on('click', function(){
+        $(this).toggleClass('is-active')
+        });
+});
+
+// $(window).on('load',function(){
+var toggleSwitch = document.getElementById('toggle-switch')
+$(toggleSwitch).on('change', function(){
+    if(toggleSwitch.checked == true){
+            $('body').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('a strong').css({
+                color: 'white'
+                });
+            $('nav.navbar.is-fixed-top.is-white').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('a.navbar-item').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('header.modal-card-head').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('footer.modal-card-foot').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('section.modal-card-body').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('.modal-card').css({
+                color: 'white',
+                'background-color': '#002b36'
+                });
+            $('button.button').css({
+                'background-color': '#002b36'
+                });
+            $('button#fixedbutton').css ({
+                'background-color': '#209cee'
+            });
+            $('button.level-item').css ({
+               'background-color':  '#002b36'
+            });
+    } else {
+        $('body').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('a strong').css({
+            color: 'black'
+            });
+        $('nav.navbar.is-fixed-top.is-white').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('a.navbar-item').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('header.modal-card-head').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('footer.modal-card-foot').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('section.modal-card-body').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('.modal-card').css({
+            color: 'black',
+            'background-color': 'white'
+            });
+        $('button.button').css({
+            'background-color': ''
+            });
+        $('button#fixedbutton').css ({
+            'background-color': '#209cee'
+        });
+        $('button.level-item').css ({
+            'background-color':  'white'
+        });
+    };
+})
+
+$(document).ready(function() {
+
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $(".navbar-burger").toggleClass("is-active");
+        $(".navbar-menu").toggleClass("is-active");
+    });
+    $('button.delete').click(function(){
+            $('.notification.is-info').hide()
+        });
+});
+
+$(document).ready(function() {
+  $(window).keydown(function(event){
+    if(event.keyCode == 13) {
+      event.preventDefault();
+      return false;
+    }
+  });
+});
+
+</script>
+{% endblock %}

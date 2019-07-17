@@ -1,0 +1,94 @@
+body {
+    font-family: Arial, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, メイリオ, Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+}
+.media {
+    align-items: flex-start;
+    display: flex;
+    text-align: left;
+    margin-top: 30px;
+}
+p#profile-img{
+    position: relative;
+    left: 10px;
+    bottom: 50px;
+}
+p#profile-img img{
+    border-radius: 50% !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+.box:not(:last-child), .content:not(:last-child), .notification:not(:last-child), .progress:not(:last-child), .table:not(:last-child), .table-container:not(:last-child), .title:not(:last-child), .subtitle:not(:last-child), .block:not(:last-child), .highlight:not(:last-child), .breadcrumb:not(:last-child), .level:not(:last-child), .list:not(:last-child), .message:not(:last-child), .tabs:not(:last-child) {
+    margin-bottom: initial !important;
+}
+.user-name {
+    position: absolute;
+    bottom: 3px;
+}
+.user-profile{
+    position: absolute;
+    margin-top: 10px;
+}
+button#follow-btn {
+    position: absolute;
+    margin-top: -40px;
+    left: 69%
+}
+button#unfollow-btn {
+    position: absolute;
+    margin-top: -40px;
+    left: 69%
+}
+button#edit-btn {
+    position: absolute;
+    margin-top: -40px;
+    left: 480%
+}
+.fixedbutton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px; 
+}
+#rightbutton {
+    position: absolute;
+    right: 10px;
+}
+#leftbutton {
+    position: absolute;
+    left: 10px;
+}
+.modal-card-head {
+    padding: 30px !important;
+}
+.contents {
+    margin-top: 100px;
+}
+.follow {
+  position: absolute;
+  margin-top: 100px !important;
+}
+img#picture {
+    height: 291px !important;
+    width: 519px !important;
+    object-fit: cover;
+}
+img#profile {
+    border-radius: 50% !important;
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover;
+}
+img#background {
+    height: 300px !important;
+    width: 658px !important;
+    object-fit: cover;
+}
+.modal-background {
+    background-color: rgba(10, 10, 10, 0.86) !important;
+    opacity: 0.1 !important;
+}
+a.navbar-item {
+    margin-left: 70px;
+}
+a.navbar-link.is-arrowless {
+    margin-left: 70px;
+  }

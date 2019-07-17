@@ -1,0 +1,81 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+<section class="hero has-background-info is-fullheight" style="display: none">
+  <div class="hero-body">
+    <div class="container">
+        <div class="columns is-centered">
+          <div class="column is-8-tablet is-8-desktop is-8-widescreen">
+            <span class="box">
+              <!-- <h1>{% trans "Sign Up" %}</h1> -->
+            
+              <!-- <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p> -->
+              <p>既にアカウント作成済みの方は、こちらから<a href="{{ login_url }}">ログイン</a>してください</p>
+              <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+                <div class="form-group">
+                  {% csrf_token %}
+                  {{ form|crispy }}
+                  {% if redirect_field_value %}
+                  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" class="form-control form-control-lg rounded-0"/>
+                  {% endif %}
+                  <!-- <button class="button is-medium has-background-info has-text-white" type="submit">{% trans "Sign Up" %} &raquo;</button> -->
+                  <button class="button is-medium has-background-info has-text-white is-rounded" type="submit">アカウント作成</button>
+                </div>
+              </form>
+              </span>
+            </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+
+    // Check for click events on the navbar burger icon
+        $(".navbar-burger").click(function() {
+
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            $(".navbar-burger").toggleClass("is-active");
+            $(".navbar-menu").toggleClass("is-active");
+        });
+    });
+    $(window).on('load', function(){
+      $('button.button.is-medium.has-background-info.has-text-white').css ({
+        'margin-top': '10px'
+      });
+      $('.hero.is-fullheight').css ({
+        'min-height': '94vh'
+      });
+      $('label.col-form-label.requiredField').addClass('label');
+      $('label.col-form-label.requiredField').css ({
+        margin: '5px'
+      });
+      $('input#id_email').attr('autocomplete', 'off');
+      $('input#id_username').attr('autocomplete', 'off');
+      $('input#id_username').addClass('input');
+      $('input#id_email').addClass('input');
+      $('input#id_password1').addClass('input');
+      $('input#id_password2').addClass('input');
+      $('.input').css ({
+        'max-width': '50%'
+      });
+      $('section').css({
+        display: 'flex'
+      });
+      $('div.navbar-dropdown a.navbar-item').css({
+        'margin-left': 'initial'
+      });
+      $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+        border: 'transparent'
+      });
+})
+</script>
+{% endblock %}

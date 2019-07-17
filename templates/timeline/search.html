@@ -1,0 +1,166 @@
+{% load i18n static %}
+<!DOCTYPE html>{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:"ja" }}" class="has-navbar-fixed-top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block head_title %}検索{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <!-- <link rel="stylesheet" href="{% static 'accounts/css/index.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'timeline/css/search.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
+  </head>
+  <body>
+    {% block body %}
+    <div class="columns">
+        <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+          <div class="column">
+              <div class="navbar-brand">
+                  <!-- <a class="navbar-item" href="https://twitter.com"> -->
+                  <!-- <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"> -->
+                  <!-- <div style="font-size: 0.5rem;"><i class="fab fa-twitter fa-3x"></i></div>
+                  </a> -->
+              
+                  <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  </a>
+              </div>
+          </div>
+          <div id="navbarBasicExample" class="navbar-menu">
+              <div class="column is-three-fifths">
+                  <div class="navbar-start">
+                  <a class="navbar-item" href="{% url 'timeline:index' %}">
+                      <div style="font-size: 0.5rem;"><i class="fas fa-home fa-3x"></i></div>
+                  </a>
+              
+                    <a class="navbar-item" href="{% url 'timeline:search' %}">
+                        <div style="font-size: 0.5rem;"><i class="fas fa-search fa-3x"></i></div>
+                    </a>
+
+                  <a class="navbar-item">
+                  <div style="font-size: 0.5rem;"><i class="fas fa-bell fa-3x"></i></div>
+                  </a>
+
+                  <a class="navbar-item">
+                      <div style="font-size: 0.5rem;"><i class="fas fa-envelope fa-3x"></i></div>
+                  </a>
+
+                  <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link is-arrowless">
+                        <span style="font-size: 0.5rem;"><i class="fas fa-ellipsis-h fa-3x"></i></span>
+                    </a>
+            
+                    <div class="navbar-dropdown">
+                    {% if user %}
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'account_email' %}" class="navbar-item button has-text-link"><span style="font-size: 0.7rem;"><i class="fas fa-at"></i></span>&nbsp;&nbsp;メールアドレス変更</a>
+                    <a href="{% url 'account_logout' %}" class="navbar-item button has-text-danger"><span style="font-size: 0.7rem;"><i class="fas fa-sign-out-alt"></i></span>&nbsp;&nbsp;ログアウト</a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}" class="navbar-item button has-text-primary"><span style="font-size: 0.7rem;"><i class="fas fa-sign-in-alt"></i></span>&nbsp;&nbsp;ログイン</a>
+                    <a href="{% url 'account_signup' %}" class="navbar-item button has-text-info"><span style="font-size: 0.7rem;"><i class="fas fa-user"></i></span>&nbsp;&nbsp;アカウント作成</a>
+                    {% endif %}
+                    {% endif %}
+                    </div>
+                </div>
+                  <!-- <div class="navbar-item has-dropdown is-hoverable">
+                      <a class="navbar-link">
+                      More
+                      </a>
+              
+                      <div class="navbar-dropdown">
+                      <a class="navbar-item">
+                          About
+                      </a>
+                      <a class="navbar-item">
+                          Jobs
+                      </a>
+                      <a class="navbar-item">
+                          Contact
+                      </a>
+                      <hr class="navbar-divider">
+                      <a class="navbar-item">
+                          Report an issue
+                      </a>
+                      </div>
+                  </div> -->
+                  </div>
+              </div>
+              
+              <!-- <div class="column">
+                  <div class="navbar-end">
+                  <div class="navbar-item">
+                      <div class="buttons">
+                      {% if user.is_authenticated %}
+                      <a href="{% url 'account_email' %}" class="button is-link is-outlined">メールアドレス変更</a>
+                      <a href="{% url 'account_logout' %}" class="button is-danger is-outlined">ログアウト</a>
+                      {% else %}
+                      <a href="{% url 'account_login' %}" class="button is-primary is-outlined">ログイン</a>
+                      <a href="{% url 'account_signup' %}" class="button is-info is-outlined">アカウント作成</a>
+                      {% endif %}
+                      </div>
+                  </div>
+                  </div>
+              </div> -->
+          </div>
+        </nav>
+    </div>
+    {% block content %}
+    <div class="container">
+        <div class="contents" style="display: none">
+            <div class="columns">
+                <div class="column"></div>
+                <div class="column is-three-fifths">
+                    {% for account, user_of_account in context %}
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-96x96">
+                                <img class="lazyload" id="profile" src="{% static 'images/transparent.png' %}" data-src="{{ account.profile_image.url }}" alt="Placeholder image">
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="content">
+                                <div class="user-name">
+                                    <a href="{% url 'accounts:detail' user_of_account.username %}"><strong>{{ account.name }}</strong></a>
+                                    <p><small>@{{ user_of_account.username }}</small></p>
+                                </div>
+                                <div class="user-profile">
+                                    <p>{{ account.profile }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                <div class="column"></div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% endblock %}
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> -->
+    {% block extra_js %}
+    <script type="text/javascript" src="{% static 'timeline/js/search.js' %}"></script>
+    <script>
+        $(window).on('load',function(){
+            $('div.navbar-dropdown a.navbar-item').css({
+                'margin-left': 'initial'
+            });
+            $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+                border: 'transparent'
+            });
+            $('.contents').fadeIn('slow');
+        });
+    </script>
+    {% endblock %}
+  </body>
+</html>

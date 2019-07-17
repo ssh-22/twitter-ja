@@ -1,0 +1,109 @@
+{% extends "account/base.html" %}
+
+{% load i18n static %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+<link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+
+{% block content %}
+
+<section class="hero has-background-primary is-fullheight" style="display: none">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-8-tablet is-8-desktop is-8-widescreen">
+                    <span class="box">
+                        <!-- <label class="label is-large">{% trans "Sign In" %}</label> -->
+
+                        {% get_providers as socialaccount_providers %}
+
+                        {% if socialaccount_providers %}
+                        <!-- <p>{% blocktrans with site.name as site_name %}Please sign in with one
+                        of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+                        for a {{ site_name }} account and sign in below:{% endblocktrans %}</p> -->
+                        <a href="{{ signup_url }}" class="navbar-item button has-text-info">Twitterで登録</a>
+                    
+                        <div class="socialaccount_ballot">
+
+                            <ul class="socialaccount_providers">
+                            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                            </ul>
+
+                            <div class="login-or">{% trans 'or' %}</div>
+
+                        </div>
+
+                        {% include "socialaccount/snippets/login_extra.html" %}
+
+                        {% else %}
+                        <!-- <p>{% blocktrans %}If you have not created an account yet, then please
+                        <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p> -->
+                        <p>まだアカウントをお持ちでない方は、こちらから
+                            <a href="{{ signup_url }}">アカウント作成</a> してください</p>
+                        {% endif %}
+  
+                        <form class="login" method="POST" action="{% url 'account_login' %}">
+                            <div class="form-group">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                {% if redirect_field_value %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                                {% endif %}
+                                <a class="tag is-warning" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a><br>
+                                <button class="button is-medium has-background-primary has-text-white is-rounded" type="submit">{% trans "Sign In" %}</button>
+                            </div>
+                        </form>
+                      </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+
+    // Check for click events on the navbar burger icon
+        $(".navbar-burger").click(function() {
+
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            $(".navbar-burger").toggleClass("is-active");
+            $(".navbar-menu").toggleClass("is-active");
+        });
+        $('button.delete').click(function(){
+            $('.notification.is-info').hide()
+        });
+    });
+    $(window).on('load', function(){
+      $('button.button.is-medium.has-background-primary.has-text-white').css ({
+        'margin-top': '10px'
+      });
+      $('.hero.is-fullheight').css ({
+        'min-height': '94vh'
+      });
+      $('label.col-form-label.requiredField').addClass('label');
+      $('label.col-form-label.requiredField').css ({
+        margin: '5px'
+      });
+      $('input#id_login').attr('autocomplete', 'off');
+      $('input#id_login').addClass('input');
+      $('input#id_password').addClass('input');
+      $('.input').css ({
+        'max-width': '50%'
+      });
+      $('section').css({
+        display: 'flex'
+      });
+      $('div.navbar-dropdown a.navbar-item').css({
+        'margin-left': 'initial'
+      });
+      $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+        border: 'transparent'
+      });
+})
+</script>
+{% endblock %}

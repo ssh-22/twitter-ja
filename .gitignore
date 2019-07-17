@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.log
+local_settings.py
+*.sqlite3
+
+.DS_Store
+media/

@@ -1,0 +1,392 @@
+{% load i18n static %}
+<!DOCTYPE html>{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:"ja" }}" class="has-navbar-fixed-top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block head_title %}{{ account_of_user.name }}さん（@{{ target_user.username }}）{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="stylesheet" href="{% static 'accounts/css/index.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
+  </head>
+  <body>
+    {% block body %}
+    <div class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <!-- Any other Bulma elements you want -->
+          <div class="modal" id="my-modal">
+              <div class="modal-background"></div>
+              <div class="modal-card">
+                <form action="{% url 'accounts:edit' user.username %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                      <header class="modal-card-head">
+                          <button type="button" id="leftbutton" class="delete" aria-label="close" data-target="my-modal"></button>
+                          <strong style='font-family: Arial, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, メイリオ, Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;'>&nbsp&nbspプロフィールを編集</strong>
+                          <button type="submit" id="rightbutton" class="button is-info is-rounded">保存</button>
+                      </header>
+                      <section class="modal-card-body">
+                        <article class="media">
+                            <div class="media-content">
+                                    <img class="lazyload" id="background" src="{% static 'images/transparent.png' %}" data-src="{{ account_of_user.background_image.url }}" alt="Placeholder image">
+                                    <label for="background_image_uploads" id="background-image"><a><i class="fas fa-camera-retro"></i></a></label>
+                                    <input id="background_image_uploads" type="file" name="background_image" accept="image/*" style="display: none">
+                                    <p class="image is-96x96" id="profile-img">
+                                        {% if account_of_user.profile_image %}
+                                        <img class="lazyload" src="{% static 'images/transparent.png' %}" data-src="{{ account_of_user.profile_image.url }}" alt="Placeholder image">
+                                        {% endif %}
+                                        <label for="profile_image_uploads" id="profile-image"><a><i class="fas fa-camera-retro"></i></a></label>
+                                        <input id="profile_image_uploads" type="file" name="profile_image" accept="image/*" style="display: none">
+                                    </p>
+                                    <div class="user-name">
+                                        <div class="field">
+                                            <input class="input" type="text" name="name" placeholder="名前" value="{{ account_of_user.name }}">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="user-profile">
+                                        <div class="field">
+                                            <p class="control">
+                                                <textarea name="profile" class="textarea is-info" placeholder="プロフィール">{{ account_of_user.profile }}</textarea>
+                                            </p>
+                                        </div>
+                                    </div>
+                            </div>
+                        </article>
+                      </section>
+                  </form>
+              </div>
+          </div>
+          <!-- Any other Bulma elements you want -->
+        </div>
+    </div>
+    <div class="columns">
+        <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+          <div class="column">
+              <div class="navbar-brand">
+                  <!-- <a class="navbar-item" href="https://twitter.com"> -->
+                  <!-- <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"> -->
+                  <!-- <div style="font-size: 0.5rem;"><i class="fab fa-twitter fa-3x"></i></div>
+                  </a> -->
+              
+                  <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  </a>
+              </div>
+          </div>
+          <div id="navbarBasicExample" class="navbar-menu">
+              <div class="column is-three-fifths">
+                  <div class="navbar-start">
+                  <a class="navbar-item" href="{% url 'timeline:index' %}">
+                      <div style="font-size: 0.5rem;"><i class="fas fa-home fa-3x"></i></div>
+                  </a>
+              
+                    <a class="navbar-item" href="{% url 'timeline:search' %}">
+                        <div style="font-size: 0.5rem;"><i class="fas fa-search fa-3x"></i></div>
+                    </a>
+
+                  <a class="navbar-item">
+                  <div style="font-size: 0.5rem;"><i class="fas fa-bell fa-3x"></i></div>
+                  </a>
+
+                  <a class="navbar-item">
+                      <div style="font-size: 0.5rem;"><i class="fas fa-envelope fa-3x"></i></div>
+                  </a>
+
+                  <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link is-arrowless">
+                        <span style="font-size: 0.5rem;"><i class="fas fa-ellipsis-h fa-3x"></i></span>
+                    </a>
+            
+                    <div class="navbar-dropdown">
+                    {% if user %}
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'account_email' %}" class="navbar-item button has-text-link"><span style="font-size: 0.7rem;"><i class="fas fa-at"></i></span>&nbsp;&nbsp;メールアドレス変更</a>
+                    <a href="{% url 'account_logout' %}" class="navbar-item button has-text-danger"><span style="font-size: 0.7rem;"><i class="fas fa-sign-out-alt"></i></span>&nbsp;&nbsp;ログアウト</a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}" class="navbar-item button has-text-primary"><span style="font-size: 0.7rem;"><i class="fas fa-sign-in-alt"></i></span>&nbsp;&nbsp;ログイン</a>
+                    <a href="{% url 'account_signup' %}" class="navbar-item button has-text-info"><span style="font-size: 0.7rem;"><i class="fas fa-user"></i></span>&nbsp;&nbsp;アカウント作成</a>
+                    {% endif %}
+                    {% endif %}
+                    </div>
+                </div>
+              
+                  <!-- <div class="navbar-item has-dropdown is-hoverable">
+                      <a class="navbar-link">
+                      More
+                      </a>
+              
+                      <div class="navbar-dropdown">
+                      <a class="navbar-item">
+                          About
+                      </a>
+                      <a class="navbar-item">
+                          Jobs
+                      </a>
+                      <a class="navbar-item">
+                          Contact
+                      </a>
+                      <hr class="navbar-divider">
+                      <a class="navbar-item">
+                          Report an issue
+                      </a>
+                      </div>
+                  </div> -->
+                  </div>
+              </div>
+              
+              <!-- <div class="column">
+                  <div class="navbar-end">
+                  <div class="navbar-item">
+                      <div class="buttons">
+                      {% if user.is_authenticated %}
+                      <a href="{% url 'account_email' %}" class="button is-link is-outlined">メールアドレス変更</a>
+                      <a href="{% url 'account_logout' %}" class="button is-danger is-outlined">ログアウト</a>
+                      {% else %}
+                      <a href="{% url 'account_login' %}" class="button is-primary is-outlined">ログイン</a>
+                      <a href="{% url 'account_signup' %}" class="button is-info is-outlined">アカウント作成</a>
+                      {% endif %}
+                      </div>
+                  </div>
+                  </div>
+              </div> -->
+          </div>
+        </nav>
+    </div>
+    {% block content %}
+    <div class="container">
+        <div class="contents" style="display: none">
+            <div class="columns">
+                <div class="column"></div>
+                <div class="column is-three-fifths">
+                    <!-- <form action="{% url 'accounts:edit' user.username %}" method="POST" enctype="multipart/form-data"> -->
+                        {% csrf_token %}
+                        <img class="lazyload" id="background" src="{% static 'images/transparent.png' %}" data-src="{{ account_of_user.background_image.url }}" alt="Placeholder image">
+                        <!-- <label for="background_image_uploads" id="background-image" style="display: none"><a><i class="fas fa-camera-retro"></i></a></label>
+                        <input id="background_image_uploads" type="file" name="background_image" accept="image/*" style="display: none"> -->
+                        <p class="image is-96x96" id="profile-img">
+                            {% if account_of_user.profile_image %}
+                            <img class="lazyload" src="{% static 'images/transparent.png' %}" data-src="{{ account_of_user.profile_image.url }}" alt="Placeholder image">
+                            {% endif %}
+                            <!-- <label for="profile_image_uploads" id="profile-image" style="display: none;"><a><i class="fas fa-camera-retro"></i></a></label> -->
+                            <!-- <input id="profile_image_uploads" type="file" name="profile_image" accept="image/*" style="display: none"> -->
+                            {% if user.username == target_user.username %}
+                            <button class="button is-info is-outlined is-rounded" id="edit-btn">
+                                プロフィールを編集
+                            </button>
+                            <!-- <button type="submit" class="button is-info is-rounded" id="save-btn" style="display: none">
+                                保存
+                            </button> -->
+                            {% else %}
+                                {% if is_following %}
+                                <form action="{% url 'accounts:unfollow' target_user.username %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button is-info is-rounded" id="unfollow-btn">
+                                        フォロー中
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="{% url 'accounts:follow' target_user.username %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button is-info is-outlined is-rounded" id="follow-btn">
+                                        フォロー
+                                    </button>
+                                </form>
+                                {% endif %}
+                                    <!-- <input class="input" type="text" name="following_id" placeholder="Text input" style="display: none" value="{{ user.user.uuid }}">
+                                    <input class="input" type="text" name="following_id" placeholder="Text input" style="display: none" value="{{ account_of_user.uuid }}"> -->
+                            {% endif %}
+                        </p>
+                        <div class="user-name">
+                            <p><strong>{{ account_of_user.name }}</strong></p>
+                            <!-- <input class="input" type="text" name="name" placeholder="Text input" value="{{ account_of_user.name }}" style="display: none"> -->
+                            <p><small>@{{ target_user.username }}</small></p>
+                        </div>
+                        <div class="user-profile">
+                            <p>{{ account_of_user.profile }}</p>
+                            <!-- <div class="field" style="display: none">
+                                <p class="control">
+                                    <textarea name="profile" class="textarea is-info" placeholder="いまどうしてる？" style="z-index: 100;">{{ account_of_user.profile }}</textarea>
+                                </p>
+                            </div> -->
+                        </div>
+                        <div class="follow">
+                            <p><strong>{{ total_following }}</strong> <small1>フォロー中</small1>  <strong>{{ total_follower }}</strong> <small>フォロワー</small></p>
+                        </div>
+                    <!-- </form> -->
+                </div>
+                <div class="column"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="contents" style="display: none">
+            {% for tweet_of_user in tweets_of_user %}
+            <div class="columns">
+                <div class="column"></div>
+                <div class="column is-three-fifths">
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-96x96">
+                                {% if account_of_user.profile_image %}
+                                <img class="lazyload" id="profile" src="{% static 'images/transparent.png' %}" data-src="{{ account_of_user.profile_image.url }}" alt="Placeholder image">
+                                {% endif %}
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="content">
+                            <p>
+                                <strong>{{ account_of_user.name }}</strong> <small>@{{ target_user.username }}</small> <small>{{ tweet_of_user.created_at }}</small>
+                                <br>
+                                {{ tweet_of_user.tweet }}
+                            </p>
+                            {% if tweet_of_user.picture %}
+                            <img class="lazyload" id="picture" src="{% static 'images/transparent.png' %}" data-src="{{ tweet_of_user.picture.url }}" alt="Placeholder image">
+                            {% endif %}
+                            </div>
+                            <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                                </a>
+                                <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                                </a>
+                                <a class="level-item">
+                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                                </a>
+                            </div>
+                            </nav>
+                        </div>
+                        <div class="media-right">
+                            <a><i class="fas fa-chevron-down"></i></a>
+                        </div>
+                    </article>
+                </div>
+                <div class="column"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+  {% block extra_js %}
+  <script>
+    $(window).on('load',function(){
+        // $('.loader').fadeOut('fast'); 
+        $('img#background').css ({
+        height: "454px !important",
+        width: "658px !important"
+        });
+        $('.columns:first-child').css ({
+            'margin-top': '10px'
+        });
+        $('.user-profile p').css({
+            'max-width': '658px'
+        });
+        $('div.navbar-dropdown a.navbar-item').css({
+            'margin-left': 'initial'
+        });
+        $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+            border: 'transparent'
+        });
+        $('label#background-image').css({
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            'z-index': 100,
+        });
+        $('label#profile-image').css({
+            position: 'absolute',
+            bottom: '35px',
+            right: '40px',
+            'z-index': 100,
+        });
+        $('button#save-btn').css({
+            position: 'absolute',
+            'margin-top': '-40px',
+            left: '600%',
+        });
+        $('.modal-card').css ({
+            overflow: 'scroll',
+            background: 'white',
+        });
+        $('.field').css ({
+            margin: '10px'
+        });
+        $('.input, .textarea').css ({
+            width: '519px',
+        });
+        $('.contents').fadeIn('slow');
+        $('img#background.lazyload').lazyload();
+        $('p img#profile.lazyload').lazyload();
+        $('p#profile-img img.lazyload').lazyload();
+        $('img#picture.lazyload').lazyload();
+        // $('button#edit-btn').on('click', function(){
+        //     $('button#edit-btn').hide();
+        //     $('button#save-btn').css({
+        //         display: 'block'
+        //     });
+        //     $('label#background-image').css({
+        //         display: 'block'
+        //     });
+        //     $('label#profile-image').css({
+        //         display: 'block'
+        //     });
+        // });
+        $('button#edit-btn').on('click', function(){
+            $('div.modal').addClass('is-active');
+        });
+        $('.modal-background, button.delete').on('click', function(){
+            $('div.modal').removeClass('is-active');
+        });
+        $(function(){
+            $('button#unfollow-btn').hover(function(){
+                $('button#unfollow-btn').text("フォロー解除");
+                $('button#unfollow-btn').removeClass('is-info');
+                $('button#unfollow-btn').addClass('is-danger');
+            }, function(){
+                $('button#unfollow-btn').text("フォロー中");
+                $('button#unfollow-btn').removeClass('is-danger');
+                $('button#unfollow-btn').addClass('is-info');
+            });
+        });
+    });
+    $(document).ready(function() {
+
+      // Check for click events on the navbar burger icon
+      $(".navbar-burger").click(function() {
+
+          // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+          $(".navbar-burger").toggleClass("is-active");
+          $(".navbar-menu").toggleClass("is-active");
+        });
+      });
+      $('button.delete').click(function(){
+        $('.notification.is-info').hide()
+      });
+
+      $(document).ready(function() {
+        $(window).keydown(function(event){
+            if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+            }
+        });
+        });
+    </script>
+    {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,142 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Account" %}{% endblock %}
+
+{% block content %}
+<section class="hero has-background-link is-fullheight" style="display: none">
+  <div class="hero-body">
+      <div class="container">
+          <div class="columns is-centered">
+              <div class="column is-8-tablet is-8-desktop is-8-widescreen">
+                  <span class="box">
+                    <!-- <h1>{% trans "E-mail Addresses" %}</h1> -->
+                    {% if user.emailaddress_set.all %}
+                    <!-- <p>{% trans 'The following e-mail addresses are associated with your account:' %}</p> -->
+                    <p>以下のメールアドレスがアカウントに登録されています</p><br>
+
+                    <form action="{% url 'account_email' %}" class="email_list" method="post">
+                    {% csrf_token %}
+                    <fieldset class="blockLabels">
+
+                      {% for emailaddress in user.emailaddress_set.all %}
+                    <div class="ctrlHolder">
+                          <label for="email_radio_{{forloop.counter}}" class="{% if emailaddress.primary %}primary_email{%endif%}">
+
+                          <input id="email_radio_{{forloop.counter}}" type="radio" name="email" {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{%endif %} value="{{emailaddress.email}}"/>
+
+                    {{ emailaddress.email }}
+                        {% if emailaddress.verified %}
+                        <span class="verified">{% trans "Verified" %}</span>
+                        {% else %}
+                        <span class="unverified">{% trans "Unverified" %}</span>
+                        {% endif %}
+                          {% if emailaddress.primary %}<span class="primary">{% trans "Primary" %}</span>{% endif %}
+                    </label>
+                    </div>
+                      {% endfor %}
+
+                    <div class="buttonHolder">
+                          <button class="button has-background-link has-text-white is-rounded" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
+                          <button class="button has-background-primary has-text-white is-rounded" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
+                          <button class="button has-background-danger has-text-white is-rounded" type="submit" name="action_remove" >{% trans 'Remove' %}</button>
+                    </div>
+
+                    </fieldset>
+                    </form>
+
+                    {% else %}
+                    <p><strong>{% trans 'Warning:'%}</strong> {% trans "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %}</p>
+
+                    {% endif %}
+
+
+                        <h2>{% trans "Add E-mail Address" %}</h2>
+
+                        <form method="post" action="{% url 'account_email' %}" class="add_email">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button class="button is-medium has-background-link has-text-white is-rounded" name="action_add" type="submit">{% trans "Add E-mail" %}</button>
+                        </form>
+                      </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+{% block extra_body %}
+<script type="text/javascript">
+(function() {
+  var message = "{% trans 'Do you really want to remove the selected e-mail address?' %}";
+  var actions = document.getElementsByName('action_remove');
+  if (actions.length) {
+    actions[0].addEventListener("click", function(e) {
+      if (! confirm(message)) {
+        e.preventDefault();
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(window).on('load', function() {
+
+// Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $(".navbar-burger").toggleClass("is-active");
+        $(".navbar-menu").toggleClass("is-active");
+    });
+    $('button.delete').click(function(){
+        $('.notification.is-info').hide()
+    });
+});
+
+$(window).on('load', function(){
+  $('button.button.is-medium.has-background-link.has-text-white.is-rounded').css ({
+    'margin-top': '10px'
+  });
+  $('button.button.has-background-link.has-text-white.is-rounded').css ({
+    'margin': '10px'
+  });
+  $('button.button.has-background-primary.has-text-white.is-rounded').css ({
+    'margin': '10px'
+  });
+  $('button.button.has-background-danger.has-text-white.is-rounded').css ({
+    'margin': '10px'
+  });
+  $('span.verified, span.primary').css({
+    color: '#3273dc'
+  });
+  $('.hero.is-fullheight').css ({
+    'min-height': '93vh'
+  });
+  $('label.col-form-label.requiredField').addClass('label');
+  $('label.col-form-label.requiredField').css ({
+    margin: '5px'
+  });
+  $('input#id_email').attr('autocomplete', 'off');
+  $('input#id_email').addClass('input');
+  $('.input').css ({
+    'max-width': '50%'
+  });
+  $('section').css({
+    display: 'flex'
+  });
+  $('div.navbar-dropdown a.navbar-item').css({
+    'margin-left': 'initial'
+  });
+  $('a.navbar-item.button.has-text-link, a.navbar-item.button.has-text-danger, a.navbar-item.button.has-text-primary, a.navbar-item.button.has-text-info').css({
+    border: 'transparent'
+  });
+})
+</script>
+{% endblock %}

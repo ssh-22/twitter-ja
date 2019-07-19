@@ -76,7 +76,9 @@ def tweet_add(request):
 @login_required
 def tweet_delete(request):
     tweet = request.POST.get('tweet')
-    Tweet.objects.filter(id=uuid.UUID(tweet)).delete()
+    tweet_id = Tweet.objects.get(id=uuid.UUID(tweet))
+    if tweet_id.user_id == request.user.user:
+        tweet.delete()
     return redirect('timeline:index')
 
 @login_required

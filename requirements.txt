@@ -6,7 +6,7 @@ asn1crypto==0.24.0
 astroid==2.2.5
 attrs==19.1.0
 awsebcli==3.15.0
-Babel==2.7.0
+Babel==2.9.1
 backcall==0.1.0
 bcrypt==3.1.6
 binaryornot==0.4.4

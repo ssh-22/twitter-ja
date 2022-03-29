@@ -96,7 +96,7 @@ OpenVulnQuery==1.30
 packaging==19.0
 pandas==0.24.2
 pandocfilters==1.4.2
-paramiko==2.4.2
+paramiko==2.10.1
 parso==0.4.0
 pathspec==0.5.9
 pathtools==0.1.2

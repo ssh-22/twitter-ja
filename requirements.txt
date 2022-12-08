@@ -16,7 +16,7 @@ boto3==1.9.183
 botocore==1.12.183
 cached-property==1.5.1
 cement==2.8.2
-certifi==2019.3.9
+certifi==2022.12.7
 cffi==1.12.3
 chardet==3.0.4
 chromedriver-binary==74.0.3729.6.0
